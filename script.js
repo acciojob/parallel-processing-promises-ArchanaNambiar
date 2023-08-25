@@ -1,31 +1,41 @@
 //your JS code here. If required.
+// Array of image URLs to download
 const imageUrls = [
-            'url_to_image_1',
-            'url_to_image_2',
-            // Add more image URLs as needed
-        ];
+  'url_of_image_1',
+  'url_of_image_2',
+  'url_of_image_3'
+  // ... add more image URLs as needed
+];
 
-        const outputDiv = document.getElementById('output');
-        const downloadButton = document.getElementById('download-images-button');
+// Function to download an image
+function downloadImage(imageUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(`Failed to load image's URL: ${imageUrl}`);
+    img.src = imageUrl;
+  });
+}
 
-        function loadImage(url) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.src = url;
-                img.addEventListener('load', () => resolve(img));
-                img.addEventListener('error', () => reject(new Error(`Failed to load image's URL: ${url}`)));
-            });
-        }
+// Function to display images in the output div
+function displayImages(images) {
+  const outputDiv = document.getElementById('output');
+  outputDiv.innerHTML = '';
 
-        downloadButton.addEventListener('click', async () => {
-            outputDiv.innerHTML = ''; // Clear existing content
+  images.forEach((image) => {
+    outputDiv.appendChild(image);
+  });
+}
 
-            for (const imageUrl of imageUrls) {
-                try {
-                    const imgElement = await loadImage(imageUrl);
-                    outputDiv.appendChild(imgElement);
-                } catch (error) {
-                    console.error(error.message);
-                }
-            }
-        });
+// Button click event handler
+document.getElementById('download-images-button').addEventListener('click', () => {
+  const downloadPromises = imageUrls.map(downloadImage);
+
+  Promise.all(downloadPromises)
+    .then((downloadedImages) => {
+      displayImages(downloadedImages);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
